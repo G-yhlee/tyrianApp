@@ -1,3 +1,17 @@
+# to start
+
+```md
+1. sbt
+
+- ~fastOptJS
+
+2. yarn install
+
+- yarn start
+
+3. add .gitignore
+```
+
 # tyrianApp
 
 ## Setup instructions
