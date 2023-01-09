@@ -10,23 +10,41 @@ import scala.scalajs.js.annotation.*
 object Tyrianapp extends TyrianApp[Msg, Model]:
 
   def init(flags: Map[String, String]): (Model, Cmd[IO, Msg]) =
-    (0, Cmd.None)
+    (Model(0, Tab.Installation), Cmd.None)
 
-  def update(model: Model): Msg => (Model, Cmd[IO, Msg]) =
-    case Msg.Increment => (model + 1, Cmd.None)
-    case Msg.Decrement => (model - 1, Cmd.None)
+  def update(model: Model): Msg => (Model, Cmd[IO, Msg]) = (msg: Msg) =>
+    msg match
+      case sideBarMsg: SideBarMsg => SideBarUpdate.update(model)(sideBarMsg)
+      case mainMsg: MainMsg =>
+        mainMsg match
+          case MainMsg.Increment =>
+            (model.copy(value = model.value + 1), Cmd.None)
+          case MainMsg.Decrement =>
+            (model.copy(value = model.value - 1), Cmd.None)
 
   def view(model: Model): Html[Msg] =
     div(
-      button(onClick(Msg.Decrement))("-"),
+      SideBarView.view(model),
+      button(onClick(MainMsg.Decrement))("-"),
       div(model.toString),
-      button(onClick(Msg.Increment))("+")
+      button(onClick(MainMsg.Increment))("+")
     )
 
   def subscriptions(model: Model): Sub[IO, Msg] =
     Sub.None
 
-type Model = Int
+final case class Model(
+    value: Int,
+    tab: Tab
+)
 
-enum Msg:
+sealed trait Msg
+
+enum MainMsg extends Msg:
   case Increment, Decrement
+
+enum SideBarMsg extends Msg:
+  case Installation, Architecture
+
+enum Tab:
+  case Installation, Architecture
